@@ -3,7 +3,6 @@ package gui.model;
 import be.Item;
 import be.Player;
 import be.Room;
-import gui.view.OutputManager;
 
 /**
  * This class is the main class of the "World of Zuul" application. "World of
@@ -229,10 +228,13 @@ public class Game {
             takeItemString += "You just picked up " + item + "\n";
             if (item.equals(SECRET_KEY)) {
                 takeItemString += FOUND_KEY;
+                player.setSecretKey();
             }
             if (item.equals(FINAL_WEAPON)) {
                 takeItemString += FOUND_WEAPON;
             }
+        } else {
+            takeItemString += "There is no such item in this room";
         }
         return takeItemString;
     }
@@ -273,6 +275,24 @@ public class Game {
      */
     public boolean roomHasChallenge() {
         return player.getCurrentRoom().hasChallenge();
+    }
+
+    /**
+     * Check if room has a Monster
+     *
+     * @return
+     */
+    public boolean roomHasMonster() {
+        return player.getCurrentRoom().hasMonster();
+    }
+
+    /**
+     * Fight the monster
+     *
+     * @return
+     */
+    public String fightMonster() {
+        return player.encounterMonster();
     }
 
     /**
@@ -319,17 +339,17 @@ public class Game {
     /**
      * Make game over if player dies
      */
-    public static void gameOver() {
-        OutputManager.outputString("\nBetter luck next time!");
-        isGameOver = true;
+    public static String gameOver() {
+        return "\nBetter luck next time!";
     }
 
     /**
      * Win the game by freeing the princess!
+     *
+     * @return
      */
-    public static void win() {
-        OutputManager.outputString("\nCongratulations! You won the game!!!");
-        isGameWon = true;
+    public static String win() {
+        return "\nCongratulations! You won the game!!!";
     }
 
     /**

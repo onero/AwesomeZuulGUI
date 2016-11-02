@@ -12,6 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 /**
  * FXML Controller class
@@ -34,6 +35,8 @@ public class ZuulGameController implements Initializable {
     private TextArea txtInput;
     @FXML
     private TextArea txtCommand;
+    @FXML
+    private TextField txtAnswer;
 
     /**
      * Initializes the controller class.
@@ -63,12 +66,13 @@ public class ZuulGameController implements Initializable {
      */
     @FXML
     private void getGoCommand() {
+
+        //TODO ALH: Go through all commands, fix challenge, add boss, add weapon!
         String command = txtCommand.getText();
         String intention = txtInput.getText();
         switch (command) {
             case "go":
                 goRoom(intention);
-                updateRoom();
                 break;
             case "back":
                 goBack();
@@ -95,6 +99,27 @@ public class ZuulGameController implements Initializable {
     }
 
     /**
+     * Give answer to the challenge
+     */
+    @FXML
+    private void answerChallenge() {
+        String answer = txtAnswer.getText();
+        appendText(game.checkAnswer(answer));
+        updateRoom();
+        checkForMonster();
+    }
+
+    /**
+     * Check if there is a monster
+     */
+    private void checkForMonster() {
+        if (game.roomHasMonster()) {
+            appendText(game.fightMonster());
+            updateRoom();
+        }
+    }
+
+    /**
      * Updates the information about the room and the items in it in the View
      */
     private void updateRoom() {
@@ -109,6 +134,9 @@ public class ZuulGameController implements Initializable {
         appendText(game.moveToNextRoom(direction));
         if (game.roomHasChallenge()) {
             appendText(game.getChallenge());
+        } else {
+            updateRoom();
+            checkForMonster();
         }
 
     }
