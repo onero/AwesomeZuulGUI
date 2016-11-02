@@ -46,6 +46,12 @@
               </items>
             </MenuButton>
             <TextField fx:id="chosenCommand" editable="false" layoutX="194.0" layoutY="631.0" prefHeight="25.0" prefWidth="55.0" />
+            <TextField fx:id="txtExits" editable="false" layoutX="313.0" layoutY="594.0" prefHeight="25.0" prefWidth="130.0" />
+            <Label layoutX="268.0" layoutY="597.0" prefHeight="20.0" prefWidth="37.0" text="EXITS:">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
          </children>
       </Pane>
    </children>

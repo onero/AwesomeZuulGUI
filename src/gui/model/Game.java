@@ -264,7 +264,6 @@ public class Game {
         String welcome = "";
         welcome += ("Welcome to " + GAME_TITLE);
         welcome += ("\n" + GAME_TITLE + " is a new, incredibly exciting discovery game.");
-        welcome += ("\nType 'help' if you need help.");
         return welcome;
     }
 
@@ -373,12 +372,21 @@ public class Game {
     }
 
     /**
-     * Returns infoabout the Room the player is in
+     * Returns info about the Room the player is in
      *
      * @return
      */
     public String getPlayerRooom() {
         return player.getCurrentRoom().getLongDescription();
+    }
+
+    /**
+     * Get info about the exits in the Room the Player is in
+     *
+     * @return
+     */
+    public String getExits() {
+        return player.getCurrentRoom().getExits();
     }
 
     /**

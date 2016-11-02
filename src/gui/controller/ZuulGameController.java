@@ -38,6 +38,8 @@ public class ZuulGameController implements Initializable {
     private TextField txtAnswer;
     @FXML
     private TextField chosenCommand;
+    @FXML
+    private TextField txtExits;
 
     /**
      * Initializes the controller class.
@@ -165,6 +167,7 @@ public class ZuulGameController implements Initializable {
      */
     private void updateRoom() {
         txtRoom.setText(game.getPlayerRooom());
+        txtExits.setText(game.getExits());
         txtItems.setText(game.getItemsInRoom());
     }
 
