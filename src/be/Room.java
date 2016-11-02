@@ -90,8 +90,16 @@ public class Room {
     public String getLongDescription() {
         String longDescription = "";
         longDescription += "You are in " + mDescription;
-        longDescription += "\n" + getExitString();
         return longDescription;
+    }
+
+    /**
+     * Return a string of exits
+     *
+     * @return
+     */
+    public String getExits() {
+        return getExitString() + "\n";
     }
 
     /**
@@ -115,10 +123,10 @@ public class Room {
      * west".
      */
     private String getExitString() {
-        String returnString = "Exits:";
+        String returnString = "";
         Set<String> keys = mExits.keySet();
         for (String exit : keys) {
-            returnString += " " + exit;
+            returnString += exit + " ";
         }
         return returnString;
     }

@@ -135,7 +135,7 @@ public class Player {
      */
     private void checkForMonster() {
         if (mCurrentRoom.hasMonster()) {
-            fightMonster();
+            encounterMonster();
         }
     }
 
@@ -245,60 +245,74 @@ public class Player {
     /**
      * Updates the player to have the secret key!
      */
-    private void setSecretKey() {
+    public void setSecretKey() {
         mHaveKey = true;
     }
 
     /**
      * Fight the monster
+     *
+     * @return
      */
-    public void fightMonster() {
-        OutputManager.outputString("\nAaaaaarh there is a monster in here!!!");
-        checkForLastBossEncounter();
-        boolean monsterIsAlive = true;
-        OutputManager.outputString("\nCombat vs " + mCurrentRoom.getMonster().get(0).getName() + " begins!");
+    public String encounterMonster() {
+        String monsterFight = "";
+        monsterFight += ("Aaaaaarh there is a monster in here!!!\n\n");
+        monsterFight += checkForLastBossEncounter();
+        if (mCurrentRoom.hasMonster()) {
+            boolean monsterIsAlive = true;
+            monsterFight += ("Combat vs " + mCurrentRoom.getMonster().get(0).getName() + " begins!\n");
+            monsterFight += fightMonster(monsterIsAlive, monsterFight);
+        }
+        return monsterFight;
+    }
+
+    private String fightMonster(boolean monsterIsAlive, String monsterFight) {
         while (monsterIsAlive) {
-            hitMonster();
+            monsterFight += hitMonster() + "\n";
             monsterIsAlive = isMonsterStillAlive();
             if (monsterIsAlive) {
-                OutputManager.outputString(mCurrentRoom.getMonster().get(0).damagePlayer());
+                monsterFight += (mCurrentRoom.getMonster().get(0).damagePlayer() + "\n");
                 mHealth -= mCurrentRoom.getMonster().get(0).getDamage();
                 if (mHealth <= 0) {
-                    OutputManager.outputString(mCurrentRoom.getMonster().get(0).getName() + " killed you...");
-                    Game.gameOver();
+                    monsterFight += (mCurrentRoom.getMonster().get(0).getName() + " killed you...\n");
+                    monsterFight += Game.gameOver();
                     break;
                 } else {
-                    OutputManager.outputString("You now only have " + mHealth + " health left!");
+                    monsterFight += ("You now only have " + mHealth + " health left!\n");
                 }
             } else {
-                OutputManager.outputString("You have slayed " + mCurrentRoom.getMonster().get(0).getName() + " congratulations!");
-                checkBossKill();
+                monsterFight += ("You have slayed " + mCurrentRoom.getMonster().get(0).getName() + " congratulations!\n");
+                monsterFight += checkBossKill() + "\n";
                 mCurrentRoom.getMonster().remove(0);
             }
         }
+        return monsterFight;
     }
 
     /**
      * Check if killed boss was last boss or mini boss
      */
-    private void checkBossKill() {
+    private String checkBossKill() {
+        String bossKill = "";
         if (mCurrentRoom.getMonster().get(0).getName().equals(Game.getLAST_BOSS())) {
-            OutputManager.outputString("\nYou have now found the princess and she is so happy that you saved her, that she promises to marry you!");
-            Game.win();
+            bossKill += ("\nYou have now found the princess and she is so happy that you saved her, that she promises to marry you!");
+            bossKill += Game.win();
         } else {
             mCurrentRoom.getItems().add(mCurrentRoom.getMonster().get(0).getLoot());
-            OutputManager.outputString("\nWhile hitting the floor " + mCurrentRoom.getMonster().get(0).getName() + " dropped "
+            bossKill += ("\nWhile hitting the floor " + mCurrentRoom.getMonster().get(0).getName() + " dropped "
                     + mCurrentRoom.getMonster().get(0).getLoot().getItemName() + "!" + "\nThe inscription on this weapon reads:\n"
                     + mCurrentRoom.getMonster().get(0).getLoot().getItemDescription());
         }
+        return bossKill;
     }
 
     /**
      * Checks if we're facing the last boss
      */
-    private void checkForLastBossEncounter() {
+    private String checkForLastBossEncounter() {
+        String lastBossFight = "";
         if (mCurrentRoom.getMonster().get(0).getName().equals(Game.getLAST_BOSS())) {
-            OutputManager.outputString("You found the final boss " + Game.getLAST_BOSS());
+            lastBossFight += ("You found the final boss " + Game.getLAST_BOSS() + "\n");
             boolean haveFinalItem = false;
             for (Item takenItem : takenItems) {
                 if (takenItem.getItemName().equals(Game.getFINAL_WEAPON())) {
@@ -306,14 +320,15 @@ public class Player {
                 }
             }
             if (haveFinalItem) {
-                OutputManager.outputString("Good thing we picked up " + Game.getFINAL_WEAPON() + "!");
-                OutputManager.outputString("Now we can use it to kill " + Game.getLAST_BOSS());
+                lastBossFight += ("Good thing we picked up " + Game.getFINAL_WEAPON() + "!\n");
+                lastBossFight += ("Now we can use it to kill " + Game.getLAST_BOSS() + "\n");
             } else {
-                OutputManager.outputString("Sorry you must have The Ancient Sword of Dracula to enter this fight!");
-                OutputManager.outputString("You will now be teleported away to safety... TELEPORTING");
+                lastBossFight += ("Sorry you must have The Ancient Sword of Dracula to enter this fight!\n");
+                lastBossFight += ("You will now be teleported away to safety... TELEPORTING\n");
                 mCurrentRoom = (Room) mPREVIOUS_ROOMS.firstElement();
             }
         }
+        return lastBossFight;
     }
 
     /**
@@ -321,7 +336,8 @@ public class Player {
      *
      * @param monsterIsAlive
      */
-    private void hitMonster() {
+    private String hitMonster() {
+        String monsterHit = "";
         Random rand = new Random();
         int hitChance = rand.nextInt(3) + 1;
         switch (hitChance) {
@@ -337,13 +353,14 @@ public class Player {
             default:
                 break;
         }
-        OutputManager.outputString("You strike " + mCurrentRoom.getMonster().get(0).getName() + " with a devastating hit for " + mDamage + " points!");
+        monsterHit += ("You strike " + mCurrentRoom.getMonster().get(0).getName() + " with a devastating hit for " + mDamage + " points!\n");
         mCurrentRoom.getMonster().get(0).takeDamage(mDamage);
         if (mCurrentRoom.getMonster().get(0).getHealth() > 0) {
-            OutputManager.outputString("Monster now only has " + mCurrentRoom.getMonster().get(0).getHealth() + " health left!");
+            monsterHit += ("Monster now only has " + mCurrentRoom.getMonster().get(0).getHealth() + " health left!\n");
         } else {
-            OutputManager.outputString("That did it!");
+            monsterHit += ("That did it!\n");
         }
+        return monsterHit;
     }
 
     /**

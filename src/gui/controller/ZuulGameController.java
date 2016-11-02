@@ -11,7 +11,9 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 /**
  * FXML Controller class
@@ -23,17 +25,21 @@ public class ZuulGameController implements Initializable {
     private Game game;
 
     @FXML
-    private TextArea txtOutput;
-    @FXML
     private TextArea txtRoom;
     @FXML
     private TextArea txtItems;
     @FXML
     private TextArea txtInfo;
     @FXML
-    private TextArea txtInput;
+    private TextField txtInput;
     @FXML
-    private TextArea txtCommand;
+    private MenuButton txtCommand;
+    @FXML
+    private TextField txtAnswer;
+    @FXML
+    private TextField chosenCommand;
+    @FXML
+    private TextField txtExits;
 
     /**
      * Initializes the controller class.
@@ -59,32 +65,73 @@ public class ZuulGameController implements Initializable {
     }
 
     /**
+     * Sets the label command GO
+     */
+    @FXML
+    private void setCommandGo() {
+        chosenCommand.setText("GO");
+    }
+
+    /**
+     * Sets the label command BACK
+     */
+    @FXML
+    private void setCommandBack() {
+        chosenCommand.setText("BACK");
+    }
+
+    /**
+     * Sets the label command TAKE
+     */
+    @FXML
+    private void setCommandTake() {
+        chosenCommand.setText("TAKE");
+    }
+
+    /**
+     * Sets the label command DROP
+     */
+    @FXML
+    private void setCommandDrop() {
+        chosenCommand.setText("DROP");
+    }
+
+    /**
+     * Sets the label command QUIT
+     */
+    @FXML
+    private void setCommandQuit() {
+        chosenCommand.setText("QUIT");
+    }
+
+    /**
      * Retrieves the Go command from the GUI and then executes the command
      */
     @FXML
     private void getGoCommand() {
-        String command = txtCommand.getText();
+
+        //TODO ALH: Go through all commands, fix challenge, add boss, add weapon!
+        String command = chosenCommand.getText();
         String intention = txtInput.getText();
         switch (command) {
-            case "go":
+            case "GO":
                 goRoom(intention);
-                updateRoom();
                 break;
-            case "back":
+            case "BACK":
                 goBack();
                 updateRoom();
                 break;
-            case "take":
+            case "TAKE":
                 takeItem(intention);
                 updateRoom();
                 updateInventory();
                 break;
-            case "drop":
+            case "DROP":
                 dropItem(intention);
                 updateRoom();
                 updateInventory();
                 break;
-            case "quit":
+            case "QUIT":
                 quit();
                 break;
             default:
@@ -95,10 +142,32 @@ public class ZuulGameController implements Initializable {
     }
 
     /**
+     * Give answer to the challenge
+     */
+    @FXML
+    private void answerChallenge() {
+        String answer = txtAnswer.getText();
+        appendText(game.checkAnswer(answer));
+        updateRoom();
+        checkForMonster();
+    }
+
+    /**
+     * Check if there is a monster
+     */
+    private void checkForMonster() {
+        if (game.roomHasMonster()) {
+            appendText(game.fightMonster());
+            updateRoom();
+        }
+    }
+
+    /**
      * Updates the information about the room and the items in it in the View
      */
     private void updateRoom() {
         txtRoom.setText(game.getPlayerRooom());
+        txtExits.setText(game.getExits());
         txtItems.setText(game.getItemsInRoom());
     }
 
@@ -109,6 +178,9 @@ public class ZuulGameController implements Initializable {
         appendText(game.moveToNextRoom(direction));
         if (game.roomHasChallenge()) {
             appendText(game.getChallenge());
+        } else {
+            updateRoom();
+            checkForMonster();
         }
 
     }
