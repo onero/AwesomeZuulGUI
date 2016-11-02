@@ -338,6 +338,8 @@ public class Game {
 
     /**
      * Make game over if player dies
+     *
+     * @return
      */
     public static String gameOver() {
         return "\nBetter luck next time!";

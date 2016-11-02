@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -24,19 +25,19 @@ public class ZuulGameController implements Initializable {
     private Game game;
 
     @FXML
-    private TextArea txtOutput;
-    @FXML
     private TextArea txtRoom;
     @FXML
     private TextArea txtItems;
     @FXML
     private TextArea txtInfo;
     @FXML
-    private TextArea txtInput;
+    private TextField txtInput;
     @FXML
-    private TextArea txtCommand;
+    private MenuButton txtCommand;
     @FXML
     private TextField txtAnswer;
+    @FXML
+    private TextField chosenCommand;
 
     /**
      * Initializes the controller class.
@@ -62,33 +63,73 @@ public class ZuulGameController implements Initializable {
     }
 
     /**
+     * Sets the label command GO
+     */
+    @FXML
+    private void setCommandGo() {
+        chosenCommand.setText("GO");
+    }
+
+    /**
+     * Sets the label command BACK
+     */
+    @FXML
+    private void setCommandBack() {
+        chosenCommand.setText("BACK");
+    }
+
+    /**
+     * Sets the label command TAKE
+     */
+    @FXML
+    private void setCommandTake() {
+        chosenCommand.setText("TAKE");
+    }
+
+    /**
+     * Sets the label command DROP
+     */
+    @FXML
+    private void setCommandDrop() {
+        chosenCommand.setText("DROP");
+    }
+
+    /**
+     * Sets the label command QUIT
+     */
+    @FXML
+    private void setCommandQuit() {
+        chosenCommand.setText("QUIT");
+    }
+
+    /**
      * Retrieves the Go command from the GUI and then executes the command
      */
     @FXML
     private void getGoCommand() {
 
         //TODO ALH: Go through all commands, fix challenge, add boss, add weapon!
-        String command = txtCommand.getText();
+        String command = chosenCommand.getText();
         String intention = txtInput.getText();
         switch (command) {
-            case "go":
+            case "GO":
                 goRoom(intention);
                 break;
-            case "back":
+            case "BACK":
                 goBack();
                 updateRoom();
                 break;
-            case "take":
+            case "TAKE":
                 takeItem(intention);
                 updateRoom();
                 updateInventory();
                 break;
-            case "drop":
+            case "DROP":
                 dropItem(intention);
                 updateRoom();
                 updateInventory();
                 break;
-            case "quit":
+            case "QUIT":
                 quit();
                 break;
             default:
