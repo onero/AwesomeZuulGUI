@@ -241,8 +241,7 @@ public class Player {
      * Sends the player back to the previous room
      */
     public void goBack() {
-        setCurrentRoom((Room) getPreviousRooms().lastElement());
-        getPreviousRooms().remove(getPreviousRooms().lastElement());
+        setCurrentRoom((Room) getPreviousRooms().pop());
     }
 
     /**
