@@ -1,7 +1,6 @@
 package be;
 
 import gui.model.Game;
-import gui.view.OutputManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -162,6 +161,22 @@ public class Player {
     }
 
     /**
+     * Check if the player has the parsed item
+     *
+     * @param item
+     * @return
+     */
+    public boolean checkForItemInInventory(String item) {
+        boolean playerHasItem = false;
+        for (Item playerItem : getTakenItems()) {
+            if (playerItem.getItemName().equals(item)) {
+                playerHasItem = true;
+            }
+        }
+        return playerHasItem;
+    }
+
+    /**
      * Checks if room has th parsed item
      *
      * @param item
@@ -185,7 +200,6 @@ public class Player {
      * @param mItem
      */
     private void addItemToInventory(String itemName, Item mItem) {
-        OutputManager.outputString("Took item " + itemName);
         takenItems.add(mItem);
         mLoadLeft -= mItem.getItemWeight();
         getCurrentRoom().getItems().remove(mItem);
@@ -243,6 +257,30 @@ public class Player {
     }
 
     /**
+     * Returns a string of the process of picking up an item
+     *
+     * @param item
+     * @return
+     */
+    public String getTakeItemString(String item) {
+        String takeItemString = "";
+        if (checkForItemInRoom(item)) {
+            takeItem(item);
+            takeItemString += "You just picked up " + item + "\n";
+            if (item.equals(Game.getSecretKeyString())) {
+                takeItemString += Game.getFoundKeyString();
+                setSecretKey();
+            }
+            if (item.equals(Game.getFinalWeaponAsString())) {
+                takeItemString += Game.getFoundWeaponString();
+            }
+        } else {
+            takeItemString += "There is no such item in this room";
+        }
+        return takeItemString;
+    }
+
+    /**
      * Updates the player to have the secret key!
      */
     public void setSecretKey() {
@@ -294,7 +332,7 @@ public class Player {
      */
     private String checkBossKill() {
         String bossKill = "";
-        if (mCurrentRoom.getMonster().get(0).getName().equals(Game.getLAST_BOSS())) {
+        if (mCurrentRoom.getMonster().get(0).getName().equals(Game.getLastBossAsString())) {
             bossKill += ("\nYou have now found the princess and she is so happy that you saved her, that she promises to marry you!");
             bossKill += Game.win();
         } else {
@@ -311,17 +349,17 @@ public class Player {
      */
     private String checkForLastBossEncounter() {
         String lastBossFight = "";
-        if (mCurrentRoom.getMonster().get(0).getName().equals(Game.getLAST_BOSS())) {
-            lastBossFight += ("You found the final boss " + Game.getLAST_BOSS() + "\n");
+        if (mCurrentRoom.getMonster().get(0).getName().equals(Game.getLastBossAsString())) {
+            lastBossFight += ("You found the final boss " + Game.getLastBossAsString() + "\n");
             boolean haveFinalItem = false;
             for (Item takenItem : takenItems) {
-                if (takenItem.getItemName().equals(Game.getFINAL_WEAPON())) {
+                if (takenItem.getItemName().equals(Game.getFinalWeaponAsString())) {
                     haveFinalItem = true;
                 }
             }
             if (haveFinalItem) {
-                lastBossFight += ("Good thing we picked up " + Game.getFINAL_WEAPON() + "!\n");
-                lastBossFight += ("Now we can use it to kill " + Game.getLAST_BOSS() + "\n");
+                lastBossFight += ("Good thing we picked up " + Game.getFinalWeaponAsString() + "!\n");
+                lastBossFight += ("Now we can use it to kill " + Game.getLastBossAsString() + "\n");
             } else {
                 lastBossFight += ("Sorry you must have The Ancient Sword of Dracula to enter this fight!\n");
                 lastBossFight += ("You will now be teleported away to safety... TELEPORTING\n");
@@ -382,7 +420,7 @@ public class Player {
         for (Item takenItem : takenItems) {
             if (takenItem instanceof Weapon) {
                 isWeapon = true;
-                if (takenItem.getItemName().equals(Game.getFINAL_WEAPON())) {
+                if (takenItem.getItemName().equals(Game.getFinalWeaponAsString())) {
                     mHasFinalWeapon = true;
                 }
                 increasePlayerDamage(((Weapon) takenItem).getWeaponDamage());
@@ -393,7 +431,6 @@ public class Player {
 
     private void increasePlayerDamage(int weaponDamage) {
         mDamage += weaponDamage;
-        OutputManager.outputString("Your total damage is now " + mDamage + "!");
     }
 
     /**
@@ -420,5 +457,34 @@ public class Player {
      */
     public List<Item> getTakenItems() {
         return takenItems;
+    }
+
+    /**
+     * Return the size of the item
+     *
+     * @param item
+     * @return
+     */
+    public int getItemSize(String item) {
+        int size = 0;
+        for (Item playerItem : getCurrentRoom().getItems()) {
+            if (playerItem.getItemName().equals(item)) {
+                size = playerItem.getItemWeight();
+            }
+        }
+        return size;
+    }
+
+    /**
+     * Check if the player is at the beginning
+     *
+     * @return
+     */
+    public boolean isPlayerAtBeginning() {
+        boolean atBeginning = false;
+        if (getPreviousRooms().isEmpty()) {
+            atBeginning = true;
+        }
+        return atBeginning;
     }
 }

@@ -98,7 +98,7 @@ public class Room {
      *
      * @return
      */
-    public String getExits() {
+    public String getExitsAsString() {
         return getExitString() + "\n";
     }
 
@@ -198,10 +198,8 @@ public class Room {
      *
      * @return
      */
-    public String getChallenge() {
-        String challenge;
-        challenge = (mChallenges.get(0).getChallenge());
-        return challenge;
+    public String getChallengeAsString() {
+        return mChallenges.get(0).getChallenge();
     }
 
     /**
