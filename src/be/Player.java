@@ -298,29 +298,24 @@ public class Player {
         if (mCurrentRoom.hasMonster()) {
             boolean monsterIsAlive = true;
             monsterFight += ("Combat vs " + mCurrentRoom.getMonster().get(0).getName() + " begins!\n");
-            monsterFight += fightMonster(monsterIsAlive, monsterFight);
-        }
-        return monsterFight;
-    }
-
-    private String fightMonster(boolean monsterIsAlive, String monsterFight) {
-        while (monsterIsAlive) {
-            monsterFight += hitMonster() + "\n";
-            monsterIsAlive = isMonsterStillAlive();
-            if (monsterIsAlive) {
-                monsterFight += (mCurrentRoom.getMonster().get(0).damagePlayer() + "\n");
-                mHealth -= mCurrentRoom.getMonster().get(0).getDamage();
-                if (mHealth <= 0) {
-                    monsterFight += (mCurrentRoom.getMonster().get(0).getName() + " killed you...\n");
-                    monsterFight += Game.gameOver();
-                    break;
+            while (monsterIsAlive) {
+                monsterFight += hitMonster() + "\n";
+                monsterIsAlive = isMonsterStillAlive();
+                if (monsterIsAlive) {
+                    monsterFight += (mCurrentRoom.getMonster().get(0).damagePlayer() + "\n");
+                    mHealth -= mCurrentRoom.getMonster().get(0).getDamage();
+                    if (mHealth <= 0) {
+                        monsterFight += (mCurrentRoom.getMonster().get(0).getName() + " killed you...\n");
+                        monsterFight += Game.gameOver();
+                        break;
+                    } else {
+                        monsterFight += ("You now only have " + mHealth + " health left!\n");
+                    }
                 } else {
-                    monsterFight += ("You now only have " + mHealth + " health left!\n");
+                    monsterFight += ("You have slayed " + mCurrentRoom.getMonster().get(0).getName() + " congratulations!\n");
+                    monsterFight += checkBossKill() + "\n";
+                    mCurrentRoom.getMonster().remove(0);
                 }
-            } else {
-                monsterFight += ("You have slayed " + mCurrentRoom.getMonster().get(0).getName() + " congratulations!\n");
-                monsterFight += checkBossKill() + "\n";
-                mCurrentRoom.getMonster().remove(0);
             }
         }
         return monsterFight;

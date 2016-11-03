@@ -14,6 +14,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 /**
  * FXML Controller class
@@ -117,8 +119,26 @@ public class ZuulGameController implements Initializable {
      */
     @FXML
     private void getGoCommand() {
+        carryOutCommand();
+        txtInput.setText("");
 
-        //TODO ALH: Fix challenge, add boss, add weapon!
+    }
+
+    /**
+     * Check if enter is clikced on txtInput
+     */
+    @FXML
+    private void getEnterCommand(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            carryOutCommand();
+            txtInput.setText("");
+        }
+    }
+
+    /**
+     * Carry out command from chosenCommand and txtInput
+     */
+    private void carryOutCommand() {
         String command = chosenCommand.getText();
         String intention = txtInput.getText();
         switch (command) {
@@ -148,8 +168,6 @@ public class ZuulGameController implements Initializable {
             default:
                 break;
         }
-        txtInput.setText("");
-
     }
 
     /**
@@ -160,17 +178,6 @@ public class ZuulGameController implements Initializable {
         String answer = txtAnswer.getText();
         appendText(game.checkAnswer(answer));
         updateRoom();
-        checkForMonster();
-    }
-
-    /**
-     * Check if there is a monster
-     */
-    private void checkForMonster() {
-        if (game.roomHasMonster()) {
-            appendText(game.fightMonsterString());
-            updateRoom();
-        }
     }
 
     /**
@@ -190,8 +197,11 @@ public class ZuulGameController implements Initializable {
         if (game.roomHasChallenge()) {
             appendText(game.getChallengeAsString());
         } else {
-            updateRoom();
-            checkForMonster();
+            if (game.roomHasMonster()) {
+                appendText(game.fightMonsterString());
+            } else {
+                updateRoom();
+            }
         }
 
     }

@@ -59,7 +59,7 @@ public class Game {
      * Create all the rooms and link their exits together.
      */
     private void createRooms() {
-        Room casleEntrance, castleMainHall, wineCellar, dungeon, tower, tortureRoom, creepyBedroom, courtRoom, sewars, attic, kitchen, laboratory, ballRoom, secretPassage, lavatory, boat;
+        Room casleEntrance, castleMainHall, wineCellar, dungeon, tower, tortureRoom, creepyBedroom, courtRoom, sewers, attic, kitchen, laboratory, ballRoom, secretPassage, lavatory, boat;
 
         // create the rooms
         casleEntrance = new Room("the main entrance to the castle", false);
@@ -70,7 +70,7 @@ public class Game {
         tortureRoom = new Room("a dark torture room full of instruments used in the popular movie 'Fifty Shades of Grey'", false);
         creepyBedroom = new Room("a creepy bedroom riveting of lust and desire, but also despair...", false);
         courtRoom = new Room("a courtroom. The place of judgement. Truth will out!", false);
-        sewars = new Room("a dank sewar filled with moist and a flowing river", false);
+        sewers = new Room("a dank sewar filled with moist and a flowing river", false);
         attic = new Room("a mysterious attic with weird sound coming from the back of the room", false);
         kitchen = new Room("a huge kithen which smells awefully from... blood!?", false);
         laboratory = new Room("a scary laboratory containing a huge table!", false);
@@ -94,16 +94,16 @@ public class Game {
         creepyBedroom.setExit(EAST, wineCellar);
 
         dungeon.setExit(WEST, tortureRoom);
-        dungeon.setExit(NORTH, sewars);
+        dungeon.setExit(NORTH, sewers);
         dungeon.setExit(SOUTH, wineCellar);
 
         tortureRoom.setExit(NORTH, laboratory);
         tortureRoom.setExit(SOUTH, creepyBedroom);
+        tortureRoom.setExit(EAST, dungeon);
 
         laboratory.setExit(SOUTH, tortureRoom);
 
-        sewars.setExit(SOUTH, dungeon);
-        sewars.setExit(NORTH, dungeon);
+        sewers.setExit(SOUTH, dungeon);
 
         ballRoom.setExit(EAST, kitchen);
         ballRoom.setExit(NORTH, courtRoom);
@@ -148,7 +148,7 @@ public class Game {
 
         courtRoom.addItem("gavel", "a very old gavel from a dead judge", 1);
 
-        sewars.addItem("oars", "a pair of old dusty oars", 1);
+        sewers.addItem("oars", "a pair of old dusty oars", 1);
 
         ballRoom.addItem("gobbelin", "a huge gobbelin hanging on the wall", 25);
 
