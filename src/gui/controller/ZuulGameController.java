@@ -14,6 +14,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 /**
  * FXML Controller class
@@ -61,7 +63,7 @@ public class ZuulGameController implements Initializable {
     private void startGame(ActionEvent event) {
         game = new Game();
         updateRoom();
-        txtInfo.setText(game.getWelcome());
+        txtInfo.setText(game.getWelcomeString());
     }
 
     /**
@@ -105,12 +107,38 @@ public class ZuulGameController implements Initializable {
     }
 
     /**
+     * Set the label command QUIT
+     */
+    @FXML
+    private void setCommandHelp() {
+        chosenCommand.setText("HELP");
+    }
+
+    /**
      * Retrieves the Go command from the GUI and then executes the command
      */
     @FXML
     private void getGoCommand() {
+        carryOutCommand();
+        txtInput.setText("");
 
-        //TODO ALH: Go through all commands, fix challenge, add boss, add weapon!
+    }
+
+    /**
+     * Check if enter is clikced on txtInput
+     */
+    @FXML
+    private void getEnterCommand(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            carryOutCommand();
+            txtInput.setText("");
+        }
+    }
+
+    /**
+     * Carry out command from chosenCommand and txtInput
+     */
+    private void carryOutCommand() {
         String command = chosenCommand.getText();
         String intention = txtInput.getText();
         switch (command) {
@@ -134,11 +162,12 @@ public class ZuulGameController implements Initializable {
             case "QUIT":
                 quit();
                 break;
+            case "HELP":
+                help();
+                break;
             default:
                 break;
         }
-        txtInput.setText("");
-
     }
 
     /**
@@ -149,38 +178,30 @@ public class ZuulGameController implements Initializable {
         String answer = txtAnswer.getText();
         appendText(game.checkAnswer(answer));
         updateRoom();
-        checkForMonster();
-    }
-
-    /**
-     * Check if there is a monster
-     */
-    private void checkForMonster() {
-        if (game.roomHasMonster()) {
-            appendText(game.fightMonster());
-            updateRoom();
-        }
     }
 
     /**
      * Updates the information about the room and the items in it in the View
      */
     private void updateRoom() {
-        txtRoom.setText(game.getPlayerRooom());
-        txtExits.setText(game.getExits());
-        txtItems.setText(game.getItemsInRoom());
+        txtRoom.setText(game.getPlayerRooomAsString());
+        txtExits.setText(game.getExitsAsString());
+        txtItems.setText(game.getItemsInRoomAsString());
     }
 
     /**
      * Moves the player to the parsed Room
      */
     private void goRoom(String direction) {
-        appendText(game.moveToNextRoom(direction));
+        appendText(game.moveToNextRoomString(direction));
         if (game.roomHasChallenge()) {
-            appendText(game.getChallenge());
+            appendText(game.getChallengeAsString());
         } else {
-            updateRoom();
-            checkForMonster();
+            if (game.roomHasMonster()) {
+                appendText(game.fightMonsterString());
+            } else {
+                updateRoom();
+            }
         }
 
     }
@@ -199,7 +220,7 @@ public class ZuulGameController implements Initializable {
      */
     private void goBack() {
         if (!game.isAtBeginning()) {
-            game.goBack();
+            game.movePlayerBack();
         } else {
             appendText("You're at the beginning!");
         }
@@ -218,7 +239,7 @@ public class ZuulGameController implements Initializable {
      * Updates the players inventory in the view
      */
     private void updateInventory() {
-        appendText(game.getInventory());
+        appendText(game.getInventoryAsString());
     }
 
     /**
@@ -228,7 +249,7 @@ public class ZuulGameController implements Initializable {
      */
     private void dropItem(String intention) {
         if (game.checkForPlayerItem(intention)) {
-            game.dropItem(intention);
+            game.playerDropItem(intention);
         } else {
             appendText("Sorry that item doesn't exist...");
         }
@@ -239,6 +260,13 @@ public class ZuulGameController implements Initializable {
      */
     private void quit() {
         appendText(game.quit());
+    }
+
+    /**
+     * Adds help text
+     */
+    private void help() {
+        appendText(game.printHelp());
     }
 
 }

@@ -31,7 +31,7 @@
             <Button layoutX="474.0" layoutY="619.0" mnemonicParsing="false" onAction="#getGoCommand" prefHeight="43.0" prefWidth="74.0" text="GO" />
             <TextField fx:id="txtAnswer" layoutX="183.0" layoutY="510.0" prefHeight="25.0" prefWidth="110.0" promptText="Challenge input" />
             <Button layoutX="315.0" layoutY="510.0" mnemonicParsing="false" onAction="#answerChallenge" text="Answer" />
-            <TextField fx:id="txtInput" layoutX="268.0" layoutY="628.0" promptText="Write Command">
+            <TextField fx:id="txtInput" layoutX="268.0" layoutY="628.0" onKeyPressed="#getEnterCommand" promptText="Write Command">
                <font>
                   <Font size="14.0" />
                </font>
@@ -43,6 +43,7 @@
                 <MenuItem mnemonicParsing="false" onAction="#setCommandBack" text="BACK" />
                   <MenuItem mnemonicParsing="false" onAction="#setCommandDrop" text="DROP" />
                   <MenuItem mnemonicParsing="false" onAction="#setCommandQuit" text="QUIT" />
+                  <MenuItem mnemonicParsing="false" onAction="#setCommandHelp" text="HELP" />
               </items>
             </MenuButton>
             <TextField fx:id="chosenCommand" editable="false" layoutX="194.0" layoutY="631.0" prefHeight="25.0" prefWidth="55.0" />

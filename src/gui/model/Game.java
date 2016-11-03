@@ -1,8 +1,8 @@
 package gui.model;
 
-import be.Item;
 import be.Player;
 import be.Room;
+import bll.CommandWords;
 
 /**
  * This class is the main class of the "World of Zuul" application. "World of
@@ -29,8 +29,10 @@ public class Game {
     private static boolean isGameWon;
     private final String GAME_TITLE = "Adamino's magical console adventure!";
     private final String QUIT_MESSAGE = "Thank you for playing";
+    private static final String GAME_OVER = "\nBetter luck next time!";
     private static final String UNKNOWN = "I don't know what you mean...";
     private static final String LAST_BOSS = "Dracula";
+    private static final String WIN = "\nCongratulations! You won the game!!!";
     private static final String FOUND_WEAPON = "You found the Ancient Word of Dracula and now have a chance to kill him!";
     private static final String FINAL_WEAPON = "ancientSwordOfDracula";
     private static final String PASSED_TEST = "Congratulations! you passed the test.";
@@ -40,6 +42,7 @@ public class Game {
     private static final String SOUTH = "south";
     private static final String EAST = "east";
     private static final String WEST = "west";
+    private CommandWords commandWords;
 
     /**
      * Create the game and initialise its internal map.
@@ -49,13 +52,14 @@ public class Game {
         isGameWon = false;
         player = new Player("Adam", 25, 10);
         createRooms();
+        commandWords = new CommandWords();
     }
 
     /**
      * Create all the rooms and link their exits together.
      */
     private void createRooms() {
-        Room casleEntrance, castleMainHall, wineCellar, dungeon, tower, tortureRoom, creepyBedroom, courtRoom, sewars, attic, kitchen, laboratory, ballRoom, secretPassage, lavatory, boat;
+        Room casleEntrance, castleMainHall, wineCellar, dungeon, tower, tortureRoom, creepyBedroom, courtRoom, sewers, attic, kitchen, laboratory, ballRoom, secretPassage, lavatory, boat;
 
         // create the rooms
         casleEntrance = new Room("the main entrance to the castle", false);
@@ -66,7 +70,7 @@ public class Game {
         tortureRoom = new Room("a dark torture room full of instruments used in the popular movie 'Fifty Shades of Grey'", false);
         creepyBedroom = new Room("a creepy bedroom riveting of lust and desire, but also despair...", false);
         courtRoom = new Room("a courtroom. The place of judgement. Truth will out!", false);
-        sewars = new Room("a dank sewar filled with moist and a flowing river", false);
+        sewers = new Room("a dank sewar filled with moist and a flowing river", false);
         attic = new Room("a mysterious attic with weird sound coming from the back of the room", false);
         kitchen = new Room("a huge kithen which smells awefully from... blood!?", false);
         laboratory = new Room("a scary laboratory containing a huge table!", false);
@@ -90,16 +94,16 @@ public class Game {
         creepyBedroom.setExit(EAST, wineCellar);
 
         dungeon.setExit(WEST, tortureRoom);
-        dungeon.setExit(NORTH, sewars);
+        dungeon.setExit(NORTH, sewers);
         dungeon.setExit(SOUTH, wineCellar);
 
         tortureRoom.setExit(NORTH, laboratory);
         tortureRoom.setExit(SOUTH, creepyBedroom);
+        tortureRoom.setExit(EAST, dungeon);
 
         laboratory.setExit(SOUTH, tortureRoom);
 
-        sewars.setExit(SOUTH, dungeon);
-        sewars.setExit(NORTH, dungeon);
+        sewers.setExit(SOUTH, dungeon);
 
         ballRoom.setExit(EAST, kitchen);
         ballRoom.setExit(NORTH, courtRoom);
@@ -124,12 +128,11 @@ public class Game {
         attic.setExit(SOUTH, tower);
 
         // Add items to the rooms
-        // Add the needed items to finish the game
-        casleEntrance.addItem("wase1", "a beautiful wase", 2);
-        casleEntrance.addItem("wase2", "a small very ugly wase", 1);
+        casleEntrance.addItem("vase1", "a beautiful vase", 2);
+        casleEntrance.addItem("vase2", "a small very ugly vase", 1);
 
         castleMainHall.addItem("carpet1", "a huge carpet on the floor with a dragon on", 3);
-        castleMainHall.addItem("wase3", "a huge blue wase with red dragon flames on", 2);
+        castleMainHall.addItem("vase3", "a huge blue vase with red dragon flames on", 2);
 
         wineCellar.addItem("wineRack", "a winerack with 200 different wines in", 150);
         wineCellar.addItem("secretKey", "a mysterious key that might grant you access to a certain location", 0);
@@ -145,7 +148,7 @@ public class Game {
 
         courtRoom.addItem("gavel", "a very old gavel from a dead judge", 1);
 
-        sewars.addItem("oars", "a pair of old dusty oars", 1);
+        sewers.addItem("oars", "a pair of old dusty oars", 1);
 
         ballRoom.addItem("gobbelin", "a huge gobbelin hanging on the wall", 25);
 
@@ -185,10 +188,8 @@ public class Game {
      * @param direction
      * @return
      */
-    public String moveToNextRoom(String direction) {
-        String moveString = "";
-        moveString += player.goRoom(direction);
-        return moveString;
+    public String moveToNextRoomString(String direction) {
+        return player.goRoom(direction);
     }
 
     /**
@@ -200,7 +201,7 @@ public class Game {
     public String checkAnswer(String answer) {
         String challengeString = "";
         if (player.getCurrentRoom().isChallengePassed(answer)) {
-            challengeString += (getPassedTestText() + "\n");
+            challengeString += (getPassedTestString() + "\n");
         } else {
             challengeString += "It appears you failed the simple task... TELEPORTING!\n";
             player.teleportToBeginning();
@@ -211,7 +212,7 @@ public class Game {
     /**
      * Moves back to previous Room
      */
-    public void goBack() {
+    public void movePlayerBack() {
         player.goBack();
     }
 
@@ -222,21 +223,7 @@ public class Game {
      * @return
      */
     public String takeItemString(String item) {
-        String takeItemString = "";
-        if (player.checkForItemInRoom(item)) {
-            player.takeItem(item);
-            takeItemString += "You just picked up " + item + "\n";
-            if (item.equals(SECRET_KEY)) {
-                takeItemString += FOUND_KEY;
-                player.setSecretKey();
-            }
-            if (item.equals(FINAL_WEAPON)) {
-                takeItemString += FOUND_WEAPON;
-            }
-        } else {
-            takeItemString += "There is no such item in this room";
-        }
-        return takeItemString;
+        return player.getTakeItemString(item);
     }
 
     /**
@@ -244,7 +231,7 @@ public class Game {
      *
      * @param item
      */
-    public void dropItem(String item) {
+    public void playerDropItem(String item) {
         player.dropItem(item);
     }
 
@@ -253,7 +240,7 @@ public class Game {
      *
      * @return
      */
-    public String getInventory() {
+    public String getInventoryAsString() {
         return player.inventoryStatus();
     }
 
@@ -290,7 +277,7 @@ public class Game {
      *
      * @return
      */
-    public String fightMonster() {
+    public String fightMonsterString() {
         return player.encounterMonster();
     }
 
@@ -299,21 +286,23 @@ public class Game {
      *
      * @return
      */
-    public String getChallenge() {
-        return player.getCurrentRoom().getChallenge();
+    public String getChallengeAsString() {
+        return player.getCurrentRoom().getChallengeAsString();
     }
 
     // implementations of user commands:
     /**
      * Print out some help information. Here we print some stupid, cryptic
      * message and a list of the command words.
+     *
+     * @return
      */
-    private String printHelp() {
+    public String printHelp() {
         String help = "";
-        help += ("You are lost. You are alone. You wander");
-        help += ("around at the castle.");
-        help += ("Your command words are:");
-        //TODO ALH: Add commands
+        help += ("You are lost. You are alone. You wander\n");
+        help += ("around at the castle.\n");
+        help += ("Your command words are:\n");
+        help += commandWords.showAll();
         return help;
     }
 
@@ -323,7 +312,7 @@ public class Game {
      * @return
      */
     public String quit() {
-        return "Thank you for playing, Good bye!";
+        return QUIT_MESSAGE;
     }
 
     /**
@@ -341,7 +330,7 @@ public class Game {
      * @return
      */
     public static String gameOver() {
-        return "\nBetter luck next time!";
+        return GAME_OVER;
     }
 
     /**
@@ -350,7 +339,7 @@ public class Game {
      * @return
      */
     public static String win() {
-        return "\nCongratulations! You won the game!!!";
+        return WIN;
     }
 
     /**
@@ -358,7 +347,7 @@ public class Game {
      *
      * @return
      */
-    public static String getLAST_BOSS() {
+    public static String getLastBossAsString() {
         return LAST_BOSS;
     }
 
@@ -367,7 +356,7 @@ public class Game {
      *
      * @return
      */
-    public static String getFINAL_WEAPON() {
+    public static String getFinalWeaponAsString() {
         return FINAL_WEAPON;
     }
 
@@ -376,7 +365,7 @@ public class Game {
      *
      * @return
      */
-    public String getPlayerRooom() {
+    public String getPlayerRooomAsString() {
         return player.getCurrentRoom().getLongDescription();
     }
 
@@ -385,8 +374,8 @@ public class Game {
      *
      * @return
      */
-    public String getExits() {
-        return player.getCurrentRoom().getExits();
+    public String getExitsAsString() {
+        return player.getCurrentRoom().getExitsAsString();
     }
 
     /**
@@ -394,7 +383,7 @@ public class Game {
      *
      * @return
      */
-    public String getItemsInRoom() {
+    public String getItemsInRoomAsString() {
         return player.getCurrentRoom().getInventory();
     }
 
@@ -405,13 +394,7 @@ public class Game {
      * @return
      */
     public boolean checkForRoomItem(String item) {
-        boolean roomHasItem = false;
-        for (Item roomItem : player.getCurrentRoom().getItems()) {
-            if (roomItem.getItemName().equals(item)) {
-                roomHasItem = true;
-            }
-        }
-        return roomHasItem;
+        return player.checkForItemInRoom(item);
 
     }
 
@@ -422,14 +405,7 @@ public class Game {
      * @return
      */
     public boolean checkForPlayerItem(String item) {
-        boolean playerHasItem = false;
-        for (Item playerItem : player.getTakenItems()) {
-            if (playerItem.getItemName().equals(item)) {
-                playerHasItem = true;
-            }
-        }
-        return playerHasItem;
-
+        return player.checkForItemInInventory(item);
     }
 
     /**
@@ -437,7 +413,7 @@ public class Game {
      *
      * @return
      */
-    public String getWelcome() {
+    public String getWelcomeString() {
         return printWelcome();
     }
 
@@ -446,7 +422,7 @@ public class Game {
      *
      * @return
      */
-    public String getPassedTestText() {
+    public String getPassedTestString() {
         return PASSED_TEST;
     }
 
@@ -466,13 +442,7 @@ public class Game {
      * @return
      */
     public int getItemSize(String item) {
-        int size = 0;
-        for (Item playerItem : player.getCurrentRoom().getItems()) {
-            if (playerItem.getItemName().equals(item)) {
-                size = playerItem.getItemWeight();
-            }
-        }
-        return size;
+        return player.getItemSize(item);
     }
 
     /**
@@ -480,7 +450,7 @@ public class Game {
      *
      * @return
      */
-    public static String getFOUND_KEY() {
+    public static String getFoundKeyString() {
         return FOUND_KEY;
     }
 
@@ -490,10 +460,24 @@ public class Game {
      * @return
      */
     public boolean isAtBeginning() {
-        boolean atBeginning = false;
-        if (player.getPreviousRooms().isEmpty()) {
-            atBeginning = true;
-        }
-        return atBeginning;
+        return player.isPlayerAtBeginning();
+    }
+
+    /**
+     * Gets the secretKey String
+     *
+     * @return
+     */
+    public static String getSecretKeyString() {
+        return SECRET_KEY;
+    }
+
+    /**
+     * Gets the foundWeapon String
+     *
+     * @return
+     */
+    public static String getFoundWeaponString() {
+        return FOUND_WEAPON;
     }
 }
